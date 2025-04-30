@@ -1,0 +1,9 @@
+---
+creation_rules:
+  - path_regex: .+\.sops\.yaml
+    key_groups:
+      - age:
+          - age1tgg6pzphuy0ac39tcng52q34y46euy39e0gznewwmc6hwct9zetsd4xtpv
+stores:
+  yaml:
+    indent: 2

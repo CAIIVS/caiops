@@ -1,0 +1,42 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+tasks:
+  # ------------------------------------------------------------
+  # environment and tools
+  # ------------------------------------------------------------
+  env:
+    desc: Set up development environment
+    cmds:
+      - task: deps
+      - task: direnv
+      - task: precommit
+
+  deps:
+    internal: true
+    cmd: brew bundle --file {{.ROOT_DIR}}/.taskfiles/local/Brewfile
+    sources:
+      - "{{.ROOT_DIR}}/.taskfiles/local/Brewfile"
+    generates:
+      - "{{.ROOT_DIR}}/.taskfiles/local/Brewfile.lock.json"
+    preconditions:
+      - test -f {{.ROOT_DIR}}/.taskfiles/local/Brewfile
+      - which brew
+
+  precommit:
+    internal: true
+    cmd: uvx pre-commit install
+    generates:
+      - "{{.ROOT_DIR}}/.git/hooks/pre-commit"
+    preconditions:
+      - which uvx
+
+  direnv:
+    internal: true
+    cmd: direnv allow .
+    status:
+      - '[[ $(direnv status --json | jq ".state.foundRC.allowed") == 0 ]]'
+      - '[[ $(direnv status --json | jq ".state.loadedRC.allowed") == 0 ]]'
+    preconditions:
+      - which direnv

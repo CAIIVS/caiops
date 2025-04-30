@@ -1,0 +1,16 @@
+from typing import Protocol, runtime_checkable
+
+from accelerate import Accelerator
+from omegaconf import DictConfig
+from torch.utils.data import DataLoader
+
+
+@runtime_checkable
+class TrainingProtocol(Protocol):
+    def __init__(self, acc: Accelerator, *args, **kwargs) -> None: ...
+
+    def train(self, cfg: DictConfig, acc: Accelerator, dataloader: DataLoader) -> None: ...
+    def valid(self, cfg: DictConfig, acc: Accelerator, dataloader: DataLoader) -> None: ...
+    def test(self, cfg: DictConfig, acc: Accelerator, dataloader: DataLoader) -> None: ...
+
+    def on_train_end(self, cfg: DictConfig, acc: Accelerator) -> None: ...

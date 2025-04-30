@@ -1,0 +1,4 @@
+brew "node"
+brew "uv"
+brew "jq"
+brew "direnv"

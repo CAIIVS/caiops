@@ -1,0 +1,64 @@
+# ------------------------------
+# general
+# ------------------------------
+project: mnist
+num_epochs: 3
+
+# ------------------------------
+# accelerate
+# ------------------------------
+accelerate:
+  _target_: accelerate.accelerator.Accelerator
+  log_with: tensorboard
+
+# ------------------------------
+# dataset
+# ------------------------------
+dataset:
+  _target_: caiops.datasets.MNIST
+  batch_size: 64
+  valid_split: 0.2
+
+# ------------------------------
+# training loop
+# ------------------------------
+training:
+  _target_: caiops.trainings.MNIST
+  optimizer: ${optimizer}
+  loss: ${loss}
+  model: ${model}
+
+# ------------------------------
+# optimizer
+# ------------------------------
+optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 0.001
+  weight_decay: 0.0001
+
+# ------------------------------
+# loss
+# ------------------------------
+loss:
+  _target_: torch.nn.CrossEntropyLoss
+
+# ------------------------------
+# model
+# ------------------------------
+model:
+  _target_: timm.create_model
+  model_name: hf_hub:timm/mobilenetv3_small_100.lamb_in1k
+  pretrained: true
+  in_chans: 1
+  num_classes: 10
+
+# ---------------------------------
+# HYDRA SELF CONFIG: DO NOT CHANGE!
+# ---------------------------------
+hydra:
+  run:
+    dir: ${oc.env:LOGS_DIR}/${oc.env:SLURM_JOB_ID,${now:%Y-%m-%d_%H-%M-%S}}
+  sweep:
+    dir: ${oc.env:LOGS_DIR}/${oc.env:SLURM_JOB_ID,${now:%Y-%m-%d_%H-%M-%S}}
+    subdir: ${hydra.job.num}
